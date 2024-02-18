@@ -93,10 +93,13 @@ def main(start_url):
         dfs(start_url, driver, visited, pdf_merger)
     except WebDriverException as e:
         print(f"WebDriver error: {e}")
+    except Exception as e:
+        print(f"An error occurred during execution: {e}")
     finally:
-        driver.quit()
-    with open('output.pdf', 'wb') as f:
-        pdf_merger.write(f)
+        if 'driver' in locals() and driver is not None:
+            driver.quit()
+        with open('output.pdf', 'wb') as f:
+            pdf_merger.write(f)
 
 try:
     input_url = input("Enter the URL: ")
