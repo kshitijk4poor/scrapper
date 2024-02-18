@@ -51,6 +51,9 @@ def capture_page_to_pdf(driver, url):
         print(f"Error capturing page {url}: {e}")
         return None
 
+def handle_mailto_link(url, driver, pdf_merger):
+    print(f"Skipping page {url} because it contains a 'mailto:' link.")
+    return
 
 def dfs(url, driver, visited, pdf_merger):
     if url in visited:
@@ -66,11 +69,6 @@ def dfs(url, driver, visited, pdf_merger):
         return
 
     page_content = driver.page_source
-    # Check for "mailto:" links
-    if any(link.get('href', '').startswith('mailto:') for link in BeautifulSoup(page_content, 'html.parser').find_all('a')):
-        print(f"Skipping page {url} because it contains a 'mailto:' link.")
-        return
-    
     pdf_pages = capture_page_to_pdf(driver, url)
     if pdf_pages:
         for page in pdf_pages:
@@ -81,6 +79,8 @@ def dfs(url, driver, visited, pdf_merger):
         dfs(link, driver, visited, pdf_merger)
 
 def main(start_url):
+    if not start_url.startswith('http'):
+        start_url = 'https://' + start_url
     visited = set()
     pdf_merger = PdfMerger()
     options = webdriver.ChromeOptions()
